@@ -58,7 +58,7 @@ solvers =
             Inputs.day1
         , Solver
             (Day2.solvePartOne >> Solution.fromIntResult)
-            notImplemented
+            (Day2.solvePartTwo >> Solution.fromIntResult)
             Inputs.day2
         ]
 
