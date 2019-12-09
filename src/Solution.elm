@@ -1,4 +1,10 @@
-module Solution exposing (Solution(..), SolutionValue, fromInt, solutionValueToString)
+module Solution exposing
+    ( Solution(..)
+    , SolutionValue
+    , fromInt
+    , fromIntResult
+    , solutionValueToString
+    )
 
 
 type Solution
@@ -15,6 +21,16 @@ type SolutionValue
 fromInt : Int -> Solution
 fromInt =
     Solved << IntVal
+
+
+fromIntResult : Result String Int -> Solution
+fromIntResult result =
+    case result of
+        Ok val ->
+            fromInt val
+
+        Err err ->
+            Failed err
 
 
 solutionValueToString : SolutionValue -> String

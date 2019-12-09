@@ -3,10 +3,11 @@ module Main exposing (main)
 import Array exposing (Array)
 import Browser
 import Day1
+import Day2
 import Html exposing (Html)
 import Html.Attributes as Attributes
 import Html.Events as Events
-import PuzzleInput
+import Inputs
 import Solution exposing (Solution)
 
 
@@ -54,11 +55,11 @@ solvers =
         [ Solver
             (Day1.solvePartOne >> Solution.fromInt)
             (Day1.solvePartTwo >> Solution.fromInt)
-            PuzzleInput.one
+            Inputs.day1
         , Solver
+            (Day2.solvePartOne >> Solution.fromIntResult)
             notImplemented
-            notImplemented
-            ""
+            Inputs.day2
         ]
 
 
