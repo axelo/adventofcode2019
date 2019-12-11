@@ -1,12 +1,8 @@
-module Day2 exposing
-    ( runProgram
-    , runUntilOutput
-    , solvePartOne
-    , solvePartTwo
-    )
+module Day2 exposing (solve, solvePartOne, solvePartTwo)
 
 import Array exposing (Array)
 import Parser exposing (Parser)
+import Solution exposing (Solution)
 
 
 type alias Program =
@@ -34,11 +30,21 @@ type ProgramState
     | Halted
 
 
-solvePartOne : String -> Result String Int
-solvePartOne input =
+solve : String -> ( Solution, Solution )
+solve input =
+    ( solvePartOne (Just 1202) input
+    , solvePartTwo input
+    )
+        |> Tuple.mapBoth
+            Solution.fromIntResult
+            Solution.fromIntResult
+
+
+solvePartOne : Maybe Int -> String -> Result String Int
+solvePartOne maybeNounAndVerb input =
     input
         |> parseInput
-        |> Result.andThen (runProgram 1202)
+        |> Result.andThen (runProgram maybeNounAndVerb)
         |> Result.andThen (Array.get 0 >> Result.fromMaybe "Missing index 0")
 
 
@@ -86,15 +92,20 @@ runUntilOutputHelp nounAndVerb program =
 
     else
         program
-            |> runProgram nounAndVerb
+            |> runProgram (Just nounAndVerb)
             |> Result.andThen (Array.get 0 >> Result.fromMaybe "Missing index 0")
 
 
-runProgram : Int -> Program -> Result String Program
-runProgram noundAndVerb program =
+runProgram : Maybe Int -> Program -> Result String Program
+runProgram maybeNoundAndVerb program =
     runProgramHelp
         ( ( 0, Running )
-        , setProgramNounAndVerb noundAndVerb program
+        , case maybeNoundAndVerb of
+            Just noundAndVerb ->
+                setProgramNounAndVerb noundAndVerb program
+
+            Nothing ->
+                program
         )
 
 

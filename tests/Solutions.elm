@@ -1,6 +1,5 @@
 module Solutions exposing (suite)
 
-import Array
 import Day1
 import Day2
 import Expect
@@ -29,41 +28,24 @@ suite =
                 \_ -> Day1.solvePartTwo "100756" |> Expect.equal 50346
             ]
         , describe "Day2 - Part One"
-            [ test "1,0,0,0,99 becomes 2,0,0,0,99" <|
+            [ test "1,0,0,0,99 becomes 2" <|
                 \_ ->
-                    Day2.runProgram 0 (Array.fromList [ 1, 0, 0, 0, 99 ])
-                        |> Expect.equal (Ok (Array.fromList [ 2, 0, 0, 0, 99 ]))
-            , test "99,1,0,0,1,1,1,1 becomes 99,1,0,0,1,1,1,1" <|
+                    Day2.solvePartOne Nothing "1,0,0,0,99"
+                        |> Expect.equal (Ok 2)
+            , test "99,1,0,0,1,1,1,1 becomes 99" <|
                 \_ ->
-                    Day2.runProgram 100 (Array.fromList [ 99, 1, 0, 0, 1, 1, 1, 1 ])
-                        |> Expect.equal (Ok (Array.fromList [ 99, 1, 0, 0, 1, 1, 1, 1 ]))
-            , test "2,4,4,5,99,0 becomes 2,4,4,5,99,9801" <|
+                    Day2.solvePartOne Nothing "99,1,0,0,1,1,1,1"
+                        |> Expect.equal (Ok 99)
+            , test "2,4,4,5,99,0 becomes 2" <|
                 \_ ->
-                    Day2.runProgram 404 (Array.fromList [ 2, 4, 4, 5, 99, 0 ])
-                        |> Expect.equal (Ok (Array.fromList [ 2, 4, 4, 5, 99, 9801 ]))
-            , test "1,1,1,4,99,5,6,0,99 becomes 2,4,4,5,99,9801" <|
-                \_ ->
-                    Day2.runProgram 101 (Array.fromList [ 1, 1, 1, 4, 99, 5, 6, 0, 99 ])
-                        |> Expect.equal (Ok (Array.fromList [ 30, 1, 1, 4, 2, 5, 6, 0, 99 ]))
-            , test "1,12,2,4,1,2,3,4,1,2,3,4,4,99 becomes 2,4,4,5,99,9801" <|
-                \_ ->
-                    [ 1, 12, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 99 ]
-                        |> (Array.fromList >> Day2.runProgram 1202)
-                        |> Expect.equal
-                            ([ 404, 12, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 99 ]
-                                |> Array.fromList
-                                |> Ok
-                            )
-            , test "runProgram1202" <|
-                \_ ->
-                    Day2.runProgram 1202 (Array.fromList [ 1, 99, 1337, 0, 1, 0, 0, 0, 1, 0, 0, 0, 99 ])
-                        |> Expect.equal (Ok <| Array.fromList [ 404, 12, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 99 ])
+                    Day2.solvePartOne Nothing "2,4,4,5,99,0"
+                        |> Expect.equal (Ok 2)
             , describe "Day2 - Part Two"
                 [ test "Don't hang" <|
                     \_ ->
-                        case Day2.runUntilOutput 19690720 0 (Array.fromList [ 1, 0, 0, 0, 1, 0, 0, 0, 99 ]) of
+                        case Day2.solvePartTwo "1 0,0,0,1,0,0,0,99" of
                             Ok _ ->
-                                Expect.fail "Should have not found an input"
+                                Expect.fail "Should haven't found an solution"
 
                             Err _ ->
                                 Expect.pass

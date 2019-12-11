@@ -1,4 +1,6 @@
-module Day1 exposing (Fuel, fuelToString, solvePartOne, solvePartTwo)
+module Day1 exposing (solve, solvePartOne, solvePartTwo)
+
+import Solution exposing (Solution)
 
 
 type alias Mass =
@@ -7,6 +9,13 @@ type alias Mass =
 
 type alias Fuel =
     Int
+
+
+solve : String -> ( Solution, Solution )
+solve input =
+    ( solvePartOne input |> Solution.fromInt
+    , solvePartTwo input |> Solution.fromInt
+    )
 
 
 solvePartOne : String -> Fuel
@@ -27,11 +36,6 @@ parseMass : String -> List Mass
 parseMass input =
     String.split "\n" input
         |> List.filterMap String.toInt
-
-
-fuelToString : Fuel -> String
-fuelToString =
-    String.fromInt
 
 
 fuelFromMass : Mass -> Fuel

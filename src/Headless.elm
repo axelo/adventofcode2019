@@ -1,9 +1,9 @@
 port module Headless exposing (main)
 
-import Array exposing (Array)
-import Day exposing (Day(..))
 import Day1
 import Day2
+import Day3
+import DayN
 import Dict exposing (Dict)
 import Inputs
 import Solution exposing (Solution)
@@ -16,61 +16,24 @@ type alias Flags =
     List String
 
 
+type alias Day =
+    Int
+
+
 type alias DaySolution =
     ( Day, ( Solution, Solution ) )
 
 
-type alias Model =
-    ()
-
-
-inputs : Array String
-inputs =
-    Array.fromList Inputs.days
-
-
-inputForDay : Day -> Maybe String
-inputForDay day =
-    Array.get (Day.toInt day - 1) inputs
-
-
-solvers : Dict Int ( () -> Solution, () -> Solution )
-solvers =
-    [ ( Day1
-      , Day1.solvePartOne >> Solution.fromInt
-      , Day1.solvePartTwo >> Solution.fromInt
-      )
-    , ( Day2
-      , Day2.solvePartOne >> Solution.fromIntResult
-      , Day2.solvePartTwo >> Solution.fromIntResult
-      )
-    ]
-        |> List.map
-            (\( day, a, b ) ->
-                Maybe.map
-                    (\input ->
-                        ( Day.toInt day
-                        , ( always input >> a
-                          , always input >> b
-                          )
-                        )
-                    )
-                    (inputForDay day)
-            )
-        |> List.filterMap identity
-        |> Dict.fromList
-
-
-main : Program Flags Model msg
+main : Program Flags () msg
 main =
     Platform.worker
         { init = init
-        , update = update
+        , update = \_ model -> ( model, Cmd.none )
         , subscriptions = always Sub.none
         }
 
 
-init : Flags -> ( Model, Cmd msg )
+init : Flags -> ( (), Cmd msg )
 init daysToSolve =
     ( ()
     , daysToSolve
@@ -81,9 +44,17 @@ init daysToSolve =
     )
 
 
-update : msg -> Model -> ( Model, Cmd msg )
-update _ model =
-    ( model, Cmd.none )
+solvers : Dict Day (() -> ( Solution, Solution ))
+solvers =
+    [ ( 1, Day1.solve << always Inputs.day1 )
+    , ( 2, Day2.solve << always Inputs.day2 )
+    , ( 3, Day3.solve << always Inputs.day3 )
+    , ( 4, DayN.solve << always Inputs.day4 )
+    , ( 5, DayN.solve << always Inputs.day5 )
+    , ( 6, DayN.solve << always Inputs.day6 )
+    , ( 7, DayN.solve << always Inputs.day7 )
+    ]
+        |> Dict.fromList
 
 
 toOutput : Result String (List DaySolution) -> String
@@ -103,29 +74,32 @@ dayFromString : String -> Result String Day
 dayFromString str =
     str
         |> String.toInt
-        |> Maybe.andThen Day.fromInt
+        |> Maybe.andThen
+            (\number ->
+                if number >= 1 && number <= 25 then
+                    Just number
+
+                else
+                    Nothing
+            )
         |> Result.fromMaybe ("Unknown day " ++ str)
 
 
 daySolutionToString : DaySolution -> String
 daySolutionToString ( day, ( partOne, partTwo ) ) =
-    Day.toString day
+    String.fromInt day
         ++ ""
-        ++ "\n├─ Part one "
+        ++ "\n├─ "
         ++ Solution.toString partOne
-        ++ "\n├─ Part two "
+        ++ "\n├─ "
         ++ Solution.toString partTwo
 
 
 solveDay : Day -> DaySolution
 solveDay day =
-    case Dict.get (Day.toInt day) solvers of
-        Just ( solvePartOne, solvePartTwo ) ->
-            ( day
-            , ( solvePartOne ()
-              , solvePartTwo ()
-              )
-            )
+    case Dict.get day solvers of
+        Just solve ->
+            ( day, solve () )
 
         Nothing ->
             ( day
