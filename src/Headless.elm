@@ -42,8 +42,7 @@ init daysToSolve =
         |> List.map dayFromString
         |> flattenResult []
         |> Result.map (List.map solveDay)
-        |> toAnswer
-        |> sendSolutionOutput
+        |> (toOutput >> sendSolutionOutput)
     )
 
 
@@ -52,8 +51,8 @@ update _ model =
     ( model, Cmd.none )
 
 
-toAnswer : Result String (List DaySolution) -> String
-toAnswer result =
+toOutput : Result String (List DaySolution) -> String
+toOutput result =
     case result of
         Ok daySolutions ->
             List.map daySolutionToString daySolutions
