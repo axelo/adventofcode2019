@@ -1,17 +1,15 @@
 port module Headless exposing (main)
 
+import Array exposing (Array)
+import Day exposing (Day(..))
 import Day1
 import Day2
+import Dict exposing (Dict)
 import Inputs
 import Solution exposing (Solution)
 
 
 port sendSolutionOutput : String -> Cmd msg
-
-
-type Day
-    = Day1
-    | Day2
 
 
 type alias Flags =
@@ -24,6 +22,43 @@ type alias DaySolution =
 
 type alias Model =
     ()
+
+
+inputs : Array String
+inputs =
+    Array.fromList Inputs.days
+
+
+inputForDay : Day -> Maybe String
+inputForDay day =
+    Array.get (Day.toInt day - 1) inputs
+
+
+solvers : Dict Int ( () -> Solution, () -> Solution )
+solvers =
+    [ ( Day1
+      , Day1.solvePartOne >> Solution.fromInt
+      , Day1.solvePartTwo >> Solution.fromInt
+      )
+    , ( Day2
+      , Day2.solvePartOne >> Solution.fromIntResult
+      , Day2.solvePartTwo >> Solution.fromIntResult
+      )
+    ]
+        |> List.map
+            (\( day, a, b ) ->
+                Maybe.map
+                    (\input ->
+                        ( Day.toInt day
+                        , ( always input >> a
+                          , always input >> b
+                          )
+                        )
+                    )
+                    (inputForDay day)
+            )
+        |> List.filterMap identity
+        |> Dict.fromList
 
 
 main : Program Flags Model msg
@@ -55,60 +90,49 @@ toOutput : Result String (List DaySolution) -> String
 toOutput result =
     case result of
         Ok daySolutions ->
-            List.map daySolutionToString daySolutions
-                |> String.join "\n\n"
+            (List.map daySolutionToString daySolutions
+                |> String.join "\n│\n"
+            )
+                ++ "\n│\n└ \u{1F976} !"
 
         Err reason ->
             reason
 
 
+dayFromString : String -> Result String Day
+dayFromString str =
+    str
+        |> String.toInt
+        |> Maybe.andThen Day.fromInt
+        |> Result.fromMaybe ("Unknown day " ++ str)
+
+
 daySolutionToString : DaySolution -> String
 daySolutionToString ( day, ( partOne, partTwo ) ) =
-    dayToString day
+    Day.toString day
         ++ ""
         ++ "\n├─ Part one "
         ++ Solution.toString partOne
-        ++ "\n└─ Part two "
+        ++ "\n├─ Part two "
         ++ Solution.toString partTwo
-
-
-dayToString : Day -> String
-dayToString day =
-    case day of
-        Day1 ->
-            "Day 1"
-
-        Day2 ->
-            "Day 2"
 
 
 solveDay : Day -> DaySolution
 solveDay day =
-    ( day
-    , case day of
-        Day1 ->
-            ( Day1.solvePartOne Inputs.day1 |> Solution.fromInt
-            , Day1.solvePartTwo Inputs.day1 |> Solution.fromInt
+    case Dict.get (Day.toInt day) solvers of
+        Just ( solvePartOne, solvePartTwo ) ->
+            ( day
+            , ( solvePartOne ()
+              , solvePartTwo ()
+              )
             )
 
-        Day2 ->
-            ( Day2.solvePartOne Inputs.day2 |> Solution.fromIntResult
-            , Day2.solvePartTwo Inputs.day2 |> Solution.fromIntResult
+        Nothing ->
+            ( day
+            , ( Solution.Failed "Missing solver"
+              , Solution.Failed "Missing solver"
+              )
             )
-    )
-
-
-dayFromString : String -> Result String Day
-dayFromString day =
-    case day of
-        "1" ->
-            Ok Day1
-
-        "2" ->
-            Ok Day2
-
-        _ ->
-            Err ("Couldn't understand day " ++ day)
 
 
 flattenResult : List a -> List (Result String a) -> Result String (List a)

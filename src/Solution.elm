@@ -3,7 +3,6 @@ module Solution exposing
     , SolutionValue
     , fromInt
     , fromIntResult
-    , solutionValueToString
     , toString
     )
 
@@ -54,4 +53,4 @@ toString solution =
             solutionValueToString value
 
         Failed reason ->
-            "Failed: " ++ reason
+            reason
