@@ -1,11 +1,27 @@
 # Dependencies
 
-    npm install -g elm elm-test elm-live tailwindcss
+Node version >= 8
 
-# Rebuild styling
+    npm install -g elm elm-test
 
-    npx tailwind build src/styles.css -o dist/styles.css
+# Build
 
-# Run dev locally
+    elm make src/Headless.elm --optimize --output=dist/headless.js
 
-    elm-live src/Main.elm -- --output=dist/adventofcode2019.js --debug
+# Running
+
+    node Headless dayToSolve [otherDayToSolve] [andAnotherDayToSolve]
+
+## Examples
+
+    node Headless 1
+
+Will try to solve day 1.
+
+    node Headless 1 2
+
+Will try to solve day 1 and day 2.
+
+# Test
+
+    elm test

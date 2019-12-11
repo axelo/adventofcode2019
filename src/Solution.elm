@@ -4,6 +4,7 @@ module Solution exposing
     , fromInt
     , fromIntResult
     , solutionValueToString
+    , toString
     )
 
 
@@ -41,3 +42,16 @@ solutionValueToString val =
 
         IntVal i ->
             String.fromInt i
+
+
+toString : Solution -> String
+toString solution =
+    case solution of
+        NotTried ->
+            "Not tried"
+
+        Solved value ->
+            solutionValueToString value
+
+        Failed reason ->
+            "Failed: " ++ reason

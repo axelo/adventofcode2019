@@ -176,8 +176,8 @@ executeInstructionSize3 readIndexA readIndexB writeIndex operation program =
 
 
 readInstructionSize3 : (Int -> Int -> Int -> Instruction) -> PC -> Program -> Result String Instruction
-readInstructionSize3 toOpcode pc program =
-    Maybe.map3 toOpcode
+readInstructionSize3 toInstruction pc program =
+    Maybe.map3 toInstruction
         (Array.get pc program)
         (Array.get (pc + 1) program)
         (Array.get (pc + 2) program)
